@@ -1,5 +1,5 @@
 import { PokemonGrid, PokemonsResponse, SimplePokemon } from "@/pokemons";
-import { cacheLife, cacheTag, revalidateTag } from "next/cache";
+import { cacheLife, cacheTag } from "next/cache";
 
 export const metadata = {
   title: "151 Pokemons",
@@ -10,11 +10,25 @@ const getPokemons = async (
   limit = 10,
   offset = 0,
 ): Promise<SimplePokemon[]> => {
-  const data: PokemonsResponse = await fetch(
-    `https://pokeapi.co/api/v2/pokemon?limit=${limit}&offset=${offset}`,
-  ).then((res) => res.json());
+  "use cache";
 
-  // throw new Error("Error");
+  cacheTag("pokemons");
+
+  cacheLife({
+    stale: 30,
+    revalidate: 10,
+    expire: 60,
+  });
+
+  const response = await fetch(
+    `https://pokeapi.co/api/v2/pokemon?limit=${limit}&offset=${offset}`,
+  );
+
+  if (!response.ok) {
+    throw new Error(`Error al obtener los Pokémon: ${response.status}`);
+  }
+
+  const data: PokemonsResponse = await response.json();
 
   return data.results.map((pokemon) => ({
     id: pokemon.url.split("/").at(-2)!,
@@ -23,20 +37,6 @@ const getPokemons = async (
 };
 
 export default async function PokemonsPage() {
-  "use cache";
-
-  // flag que marca la petición como cacheable
-  cacheTag("pokemons");
-
-  // indica que el contenido de esta ruta se actualizara cada 10 segundos
-  // cacheLife({
-  //   stale: 10,
-  //   revalidate: 60,
-  // });
-
-  // esto tendria que ir en una funcion para indicar que el contenido se actualizara
-  revalidateTag("pokemons", "max");
-
   const pokemons = await getPokemons(151);
 
   return (

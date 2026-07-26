@@ -1,4 +1,4 @@
-import { Balloon, Calculator, LayoutDashboard } from "lucide-react";
+import { Balloon, Calculator, Heart, LayoutDashboard } from "lucide-react";
 
 import Image from "next/image";
 import { SidebarMenuItem } from "./SidebarMenuItem";
@@ -21,6 +21,12 @@ const menuItems = [
     icon: <Balloon size={18} />,
     title: "Pokemons",
     subtitle: "Pokedex Estatico",
+  },
+  {
+    path: "/dashboard/favorites",
+    icon: <Heart size={18} />,
+    title: "Favoritos",
+    subtitle: "Tus Pokémon guardados",
   },
 ];
 

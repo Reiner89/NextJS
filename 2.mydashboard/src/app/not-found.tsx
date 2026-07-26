@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { Home, SearchX, ArrowLeft } from "lucide-react";
-import { Sidebar } from "@/app/components";
+import { Sidebar } from "@/components";
 
 export default function NotFoundPage() {
   return (
