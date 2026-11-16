@@ -1,13 +1,25 @@
+"use client";
+
 import Image from "next/image";
 import { Heart, Info, Sparkles } from "lucide-react";
 import { SimplePokemon } from "../interfaces/simple-pokemon";
 import Link from "next/link";
+import { useAppDispatch, useAppSelector } from "@/store";
+import { addPokemon } from "@/store/pokemons/pokemons";
 
 interface Props {
   pokemon: SimplePokemon;
 }
 
 export const PokemonCard = ({ pokemon }: Props) => {
+  const dispatch = useAppDispatch();
+
+  const isFavorite = useAppSelector((state) => !!state.pokemons[pokemon.id]);
+
+  const handleFavorite = () => {
+    dispatch(addPokemon(pokemon));
+  };
+
   return (
     <article className="group relative overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-lg transition-all duration-300 hover:-translate-y-2 hover:shadow-2xl">
       <div className="relative overflow-hidden bg-slate-950 px-6 pb-7 pt-6">
@@ -28,6 +40,7 @@ export const PokemonCard = ({ pokemon }: Props) => {
               height={120}
               className="relative z-10 h-28 w-28 object-contain drop-shadow-[0_0_25px_rgba(255,255,255,0.35)] transition-transform duration-500 group-hover:scale-110"
               priority={false}
+              loading="eager"
             />
           </div>
         </div>
@@ -52,20 +65,35 @@ export const PokemonCard = ({ pokemon }: Props) => {
       </div>
 
       <div className="relative px-5 py-4">
-        <Link href="/dashboard/main" className="flex items-center gap-3">
-          <button className="flex h-10 w-10 items-center justify-center rounded-full border border-rose-200 bg-rose-50 text-rose-500 transition hover:bg-rose-100">
-            <Heart size={18} />
-          </button>
+        <button
+          onClick={handleFavorite}
+          className="flex items-center gap-3 cursor-pointer"
+        >
+          <div className="flex h-10 w-10 items-center justify-center rounded-full border border-rose-200 bg-rose-50 text-rose-500 transition hover:bg-rose-100">
+            {isFavorite ? (
+              <Heart size={18} className="fill-current text-rose-500" />
+            ) : (
+              <Heart size={18} />
+            )}
+          </div>
 
           <div>
             <div className="flex items-center gap-2">
-              <p className="font-bold text-slate-900">No es favorito</p>
+              {isFavorite ? (
+                <p className="font-bold text-slate-900">Es favorito</p>
+              ) : (
+                <p className="font-bold text-slate-900">No es favorito</p>
+              )}
               <Sparkles size={14} className="text-cyan-500" />
             </div>
 
-            <p className="text-sm text-slate-500">Ver tus campañas</p>
+            <p className="text-sm text-slate-500">
+              {isFavorite
+                ? "Este Pokémon está en tu lista de favoritos."
+                : "Haz clic para agregarlo a tus favoritos."}
+            </p>
           </div>
-        </Link>
+        </button>
       </div>
     </article>
   );
